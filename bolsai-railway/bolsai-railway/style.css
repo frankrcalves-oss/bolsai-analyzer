@@ -235,3 +235,26 @@ nav { display: flex; flex-direction: column; gap: 4px; }
 .section-title { font-size: 13px; font-weight: 500; color: var(--text2); margin-bottom: 10px; margin-top: 1.25rem; }
 .divider { border: none; border-top: 1px solid var(--border); margin: 1.25rem 0; }
 .empty-state { text-align: center; color: var(--text3); padding: 3rem 0; font-size: 13px; }
+
+/* RELATÓRIO PROFISSIONAL */
+.rel-section {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+.rel-header {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 1rem;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.rel-text {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.75;
+  margin-top: 12px;
+}
