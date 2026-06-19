@@ -1,4 +1,4 @@
-// ia.js — Analista CNPI Sênior via Claude API
+// ia.js — Analista CNPI Sênior (chamada via proxy local)
 
 async function analisarComIA(ticker, quote, fund, divs, history) {
   const dyPct  = fund.dividend_yield != null ? (fund.dividend_yield * 100).toFixed(2) + '%' : 'Dado não disponível';
@@ -11,7 +11,7 @@ async function analisarComIA(ticker, quote, fund, divs, history) {
   ).join('\n') || 'Dado não disponível';
 
   const ultimosDivs = (divs || []).slice(0, 12).map(d =>
-    `Tipo: ${d.event_type || d.type || '—'} | Ex-Data: ${d.ex_date || d.ex_dividend_date || '—'} | Pagamento: ${d.payment_date || '—'} | Valor: R$ ${Number(d.value || d.amount || 0).toFixed(4)}`
+    `Tipo: ${d.event_type || d.type || '-'} | Ex-Data: ${d.ex_date || d.ex_dividend_date || '-'} | Pagamento: ${d.payment_date || '-'} | Valor: R$ ${Number(d.value || d.amount || 0).toFixed(4)}`
   ).join('\n') || 'Dado não disponível';
 
   const prompt = `Você é um Analista CNPI Sênior especializado em Dividend Investing, Value Investing e Small Caps da Bolsa Brasileira (B3). Produza um relatório profissional completo para um cliente com patrimônio acima de R$ 5 milhões.
@@ -43,76 +43,75 @@ ${precos}
 HISTÓRICO DE PROVENTOS (últimos 12):
 ${ultimosDivs}
 
----
-
-Gere o relatório completo em JSON válido, sem markdown, no formato exato abaixo:
+Gere o relatório em JSON válido, sem markdown:
 
 {
   "resumo_executivo": {
-    "classificacao": "Excelente" | "Boa" | "Evitar",
-    "emoji": "🟢" | "🟡" | "🔴",
+    "classificacao": "Excelente",
+    "emoji": "🟢",
     "setor": "nome do setor",
-    "descricao": "2-3 frases sobre a empresa e seu negócio"
+    "descricao": "2-3 frases sobre a empresa"
   },
   "analise_dividendos": {
     "dy_atual": "X.XX%",
-    "dy_12m": "X.XX% ou Dado não disponível",
-    "tendencia": "Crescente" | "Estável" | "Decrescente",
-    "frequencia": "Mensal | Trimestral | Semestral | Anual | Irregular",
+    "dy_12m": "X.XX%",
+    "tendencia": "Crescente",
+    "frequencia": "Trimestral",
     "ultimo_valor": "R$ X.XXXX",
-    "analise": "parágrafo explicando qualidade dos dividendos"
+    "analise": "paragrafo sobre dividendos"
   },
   "calendario": {
-    "proximo_anuncio": "DD/MM/AAAA ou Nenhum dividendo anunciado até o momento",
-    "data_com": "DD/MM/AAAA ou —",
-    "data_ex": "DD/MM/AAAA ou —",
-    "data_pagamento": "DD/MM/AAAA ou —",
-    "valor_proximo": "R$ X.XXXX ou —"
+    "proximo_anuncio": "Nenhum dividendo anunciado até o momento",
+    "data_com": "-",
+    "data_ex": "-",
+    "data_pagamento": "-",
+    "valor_proximo": "-"
   },
   "qualidade_dividendos": {
-    "classificacao": "Excelente" | "Boa" | "Regular" | "Fraca",
-    "payout_ratio": "XX% ou Dado não disponível",
-    "fluxo_caixa": "Positivo | Negativo | Dado não disponível",
-    "analise": "parágrafo sobre sustentabilidade dos dividendos"
+    "classificacao": "Boa",
+    "payout_ratio": "XX%",
+    "fluxo_caixa": "Positivo",
+    "analise": "paragrafo sobre sustentabilidade"
   },
   "valuation": {
-    "situacao": "Subavaliada" | "Justa" | "Sobreavaliada",
-    "pl": "X.XX ou Dado não disponível",
-    "pvp": "X.XX ou Dado não disponível",
-    "ev_ebitda": "X.XX ou Dado não disponível",
-    "analise": "parágrafo comparando com média do setor e histórico"
+    "situacao": "Justa",
+    "pl": "X.XX",
+    "pvp": "X.XX",
+    "ev_ebitda": "X.XX",
+    "analise": "paragrafo sobre valuation"
   },
   "potencial": {
-    "preco_justo": número ou null,
+    "preco_justo": 45.00,
     "potencial_alta": "XX%",
     "potencial_baixa": "XX%",
-    "cenario_conservador": "descrição",
-    "cenario_base": "descrição",
-    "cenario_otimista": "descrição"
+    "cenario_conservador": "descricao",
+    "cenario_base": "descricao",
+    "cenario_otimista": "descricao"
   },
   "risco": {
-    "score_geral": número de 0 a 10,
-    "endividamento": número de 0 a 10,
-    "governanca": número de 0 a 10,
-    "commodities": número de 0 a 10,
-    "juros": número de 0 a 10,
-    "liquidez": número de 0 a 10,
-    "analise": "parágrafo sobre os principais riscos"
+    "score_geral": 4,
+    "endividamento": 3,
+    "governanca": 4,
+    "commodities": 7,
+    "juros": 3,
+    "liquidez": 2,
+    "analise": "paragrafo sobre riscos"
   },
   "score_final": {
-    "pontuacao": número de 0 a 100,
-    "estrelas": número de 1 a 5,
-    "classificacao": "Compra Forte" | "Compra" | "Manter" | "Evitar" | "Venda",
-    "dividendos_score": número de 0 a 30,
-    "valuation_score": número de 0 a 25,
-    "crescimento_score": número de 0 a 20,
-    "saude_score": número de 0 a 15,
-    "liquidez_score": número de 0 a 10,
-    "conclusao": "parágrafo final em linguagem de gestor profissional de patrimônio"
+    "pontuacao": 75,
+    "estrelas": 4,
+    "classificacao": "Compra",
+    "dividendos_score": 22,
+    "valuation_score": 18,
+    "crescimento_score": 15,
+    "saude_score": 12,
+    "liquidez_score": 8,
+    "conclusao": "paragrafo final profissional"
   }
 }`;
 
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
+  // Chamada via proxy local (evita CORS)
+  const res = await fetch('/ia/messages', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -122,7 +121,7 @@ Gere o relatório completo em JSON válido, sem markdown, no formato exato abaix
     })
   });
 
-  if (!res.ok) throw new Error('Erro na API de IA');
+  if (!res.ok) throw new Error(`Erro IA: ${res.status}`);
   const data = await res.json();
   const text = data.content.map(b => b.text || '').join('');
   const clean = text.replace(/```json|```/g, '').trim();

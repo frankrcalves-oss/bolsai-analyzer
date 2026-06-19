@@ -1,5 +1,6 @@
 """
 proxy.py — servidor Bolsai Analyzer para Railway
+Roteia /api/* para Bolsai API e /ia/* para Anthropic API
 """
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import urllib.request
@@ -7,10 +8,12 @@ import urllib.error
 import json
 import os
 
-API_KEY  = os.environ.get('BOLSAI_API_KEY', '')
-API_BASE = 'https://api.usebolsai.com'
-PORT     = int(os.environ.get('PORT', 8080))
-DIR      = os.path.dirname(os.path.abspath(__file__))
+BOLSAI_KEY   = os.environ.get('BOLSAI_API_KEY', '')
+ANTHROPIC_KEY = os.environ.get('ANTHROPIC_API_KEY', '')
+BOLSAI_BASE  = 'https://api.usebolsai.com'
+ANTHROPIC_URL = 'https://api.anthropic.com/v1/messages'
+PORT         = int(os.environ.get('PORT', 8080))
+DIR          = os.path.dirname(os.path.abspath(__file__))
 
 MIME = {
     '.html': 'text/html; charset=utf-8',
@@ -29,18 +32,59 @@ class Handler(BaseHTTPRequestHandler):
     def cors(self):
         self.send_header('Access-Control-Allow-Origin', '*')
         self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-        self.send_header('Access-Control-Allow-Headers', 'Content-Type, X-API-Key')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type, X-API-Key, anthropic-version')
 
     def do_OPTIONS(self):
         self.send_response(200)
         self.cors()
         self.end_headers()
 
+    def do_POST(self):
+        # Proxy para Anthropic API
+        if self.path == '/ia/messages':
+            length = int(self.headers.get('Content-Length', 0))
+            body = self.rfile.read(length)
+            req = urllib.request.Request(
+                ANTHROPIC_URL,
+                data=body,
+                headers={
+                    'Content-Type': 'application/json',
+                    'x-api-key': ANTHROPIC_KEY,
+                    'anthropic-version': '2023-06-01',
+                }
+            )
+            try:
+                with urllib.request.urlopen(req, timeout=60) as resp:
+                    result = resp.read()
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.cors()
+                self.end_headers()
+                self.wfile.write(result)
+            except urllib.error.HTTPError as e:
+                result = e.read()
+                self.send_response(e.code)
+                self.send_header('Content-Type', 'application/json')
+                self.cors()
+                self.end_headers()
+                self.wfile.write(result)
+            except Exception as e:
+                self.send_response(502)
+                self.send_header('Content-Type', 'application/json')
+                self.cors()
+                self.end_headers()
+                self.wfile.write(json.dumps({'error': str(e)}).encode())
+            return
+
+        self.send_response(404)
+        self.end_headers()
+
     def do_GET(self):
+        # Proxy para Bolsai API
         if self.path.startswith('/api/'):
-            url = API_BASE + self.path
+            url = BOLSAI_BASE + self.path
             req = urllib.request.Request(url, headers={
-                'X-API-Key': API_KEY,
+                'X-API-Key': BOLSAI_KEY,
                 'User-Agent': 'BolsaiAnalyzer/1.0',
             })
             try:
@@ -66,6 +110,7 @@ class Handler(BaseHTTPRequestHandler):
                 self.wfile.write(json.dumps({'error': str(e)}).encode())
             return
 
+        # Arquivos estáticos
         path = self.path.split('?')[0]
         if path == '/':
             path = '/index.html'
