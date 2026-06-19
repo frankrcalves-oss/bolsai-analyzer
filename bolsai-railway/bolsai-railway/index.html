@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bolsai Analyzer</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="logo">
+      <span class="logo-icon">📈</span>
+      <span class="logo-text">Bolsai Analyzer</span>
+    </div>
+    <nav>
+      <button class="nav-btn active" data-page="analise">Análise</button>
+      <button class="nav-btn" data-page="historico">Histórico</button>
+      <button class="nav-btn" data-page="screener">Screener</button>
+      <button class="nav-btn" data-page="macro">Macro</button>
+    </nav>
+    <div class="sidebar-footer">
+      <span id="uso-info">— req hoje</span>
+    </div>
+  </aside>
+
+  <main class="main">
+    <!-- ANÁLISE -->
+    <section id="page-analise" class="page active">
+      <div class="page-header">
+        <h1>Análise de Ação</h1>
+        <p class="subtitle">Fundamentos, gráfico e recomendação por IA</p>
+      </div>
+      <div class="search-bar">
+        <input id="ticker-analise" type="text" placeholder="Digite o ticker — ex: PETR4" maxlength="10" />
+        <button id="btn-analise">Analisar</button>
+      </div>
+      <div id="out-analise" class="output"></div>
+    </section>
+
+    <!-- HISTÓRICO -->
+    <section id="page-historico" class="page">
+      <div class="page-header">
+        <h1>Histórico de Preços</h1>
+        <p class="subtitle">Gráfico de candlestick e volume</p>
+      </div>
+      <div class="search-bar">
+        <input id="ticker-hist" type="text" placeholder="Digite o ticker — ex: ITUB4" maxlength="10" />
+        <select id="periodo-hist">
+          <option value="30">30 dias</option>
+          <option value="60">60 dias</option>
+          <option value="90">90 dias</option>
+          <option value="180">180 dias</option>
+        </select>
+        <button id="btn-hist">Ver histórico</button>
+      </div>
+      <div id="out-hist" class="output"></div>
+    </section>
+
+    <!-- SCREENER -->
+    <section id="page-screener" class="page">
+      <div class="page-header">
+        <h1>Screener Conservador</h1>
+        <p class="subtitle">Ações com bom dividend yield e fundamentos sólidos</p>
+      </div>
+      <div class="search-bar">
+        <button id="btn-screener">Buscar oportunidades</button>
+      </div>
+      <div id="out-screener" class="output"></div>
+    </section>
+
+    <!-- MACRO -->
+    <section id="page-macro" class="page">
+      <div class="page-header">
+        <h1>Dados Macroeconômicos</h1>
+        <p class="subtitle">SELIC, IPCA, CDI e USD/BRL</p>
+      </div>
+      <div class="search-bar">
+        <button id="btn-macro">Carregar dados</button>
+      </div>
+      <div id="out-macro" class="output"></div>
+    </section>
+  </main>
+
+  <script src="api.js"></script>
+  <script src="ui.js"></script>
+  <script src="ia.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
