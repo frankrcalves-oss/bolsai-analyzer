@@ -6,8 +6,8 @@ async function analisarComIA(ticker, quote, fund, divs, history) {
   const mgPct  = fund.net_margin != null ? (fund.net_margin * 100).toFixed(2) + '%' : 'Dado não disponível';
   const roaPct = fund.roa != null ? (fund.roa * 100).toFixed(2) + '%' : 'Dado não disponível';
 
-  const precos = (history || []).slice(0, 30).map(p =>
-    `${p.trade_date}: Abertura R$${p.open} | Máx R$${p.high} | Mín R$${p.low} | Fechamento R$${p.close} | Volume ${p.volume}`
+  const precos = (history || []).slice(0, 10).map(p =>
+    `${p.trade_date}: R$${p.close} (Max R$${p.high} | Min R$${p.low})`
   ).join('\n') || 'Dado não disponível';
 
   const ultimosDivs = (divs || []).slice(0, 12).map(d =>
@@ -116,7 +116,7 @@ Gere o relatório em JSON válido, sem markdown:
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       model: 'claude-sonnet-4-6',
-      max_tokens: 3000,
+      max_tokens: 4000,
       messages: [{ role: 'user', content: prompt }]
     })
   });
